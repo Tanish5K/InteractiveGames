@@ -1,0 +1,7 @@
+packages:
+  - "web"
+  - "api"
+allowBuilds:
+  '@prisma/engines': false
+  esbuild: false
+  prisma: false
