@@ -1,14 +1,23 @@
 import { useEffect, useRef, useState } from "react";
-import type { NormalizedLandmark } from "@mediapipe/tasks-vision";
+import type { HandLandmarkerResult } from "@mediapipe/tasks-vision";
 import { initHandLandmarker } from "./handLandmarker";
+import {
+  TwoHandGestureEngine,
+  type TwoHandGestureState,
+} from "../gestures/twoHandGestureEngine";
 
 export type Status = "loading" | "error" | "ready";
 
-export function useHandLandmarks() {
+export function useGestureTracking() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [status, setStatus] = useState<Status>("loading");
   const [errorMessage, setErrorMessage] = useState("");
-  const landmarksRef = useRef<NormalizedLandmark[][]>([]);
+  const resultRef = useRef<HandLandmarkerResult | null>(null);
+  const gestureStateRef = useRef<TwoHandGestureState>({
+    Left: null,
+    Right: null,
+  });
+  const engineRef = useRef(new TwoHandGestureEngine());
 
   useEffect(() => {
     let animationFrameId: number;
@@ -50,11 +59,18 @@ export function useHandLandmarks() {
       function detectFrame() {
         if (cancelled) return;
         if (video.readyState >= 2) {
-          const result = handLandmarker!.detectForVideo(
-            video,
-            performance.now(),
+          const timestamp = performance.now();
+          const result = handLandmarker!.detectForVideo(video, timestamp);
+          resultRef.current = result;
+
+          gestureStateRef.current = engineRef.current.update(
+            result,
+            timestamp,
+            video.videoWidth,
+            video.videoHeight,
+            window.innerWidth,
+            window.innerHeight,
           );
-          landmarksRef.current = result.landmarks;
         }
         animationFrameId = requestAnimationFrame(detectFrame);
       }
@@ -69,5 +85,5 @@ export function useHandLandmarks() {
     };
   }, []);
 
-  return { videoRef, status, errorMessage, landmarksRef };
+  return { videoRef, status, errorMessage, resultRef, gestureStateRef };
 }
