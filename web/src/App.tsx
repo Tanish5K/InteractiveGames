@@ -1,7 +1,7 @@
-import { HandTrackingDebug } from "./pages/HandTrackingDebug";
+import { GestureDebug } from "./pages/GestureDebug";
 
 function App() {
-  return <HandTrackingDebug />;
+  return <GestureDebug />;
 }
 
 export default App;
