@@ -1,7 +1,8 @@
 import { GestureDebug } from "./pages/GestureDebug";
+import { InputHarnessDebug } from "./pages/InputHarnessDebug"
 
 function App() {
-  return <GestureDebug />;
+  return <InputHarnessDebug />;
 }
 
 export default App;

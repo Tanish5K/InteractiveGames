@@ -5,6 +5,7 @@ import {
   TwoHandGestureEngine,
   type TwoHandGestureState,
 } from "../gestures/twoHandGestureEngine";
+import { publishGestureInput } from "../../input/gestureInputAdapter";
 
 export type Status = "loading" | "error" | "ready";
 
@@ -46,6 +47,7 @@ export function useGestureTracking() {
         return;
       }
 
+      //Dawg even god doesn't know what ts is for (it just works)
       if (cancelled) {
         stream.getTracks().forEach((t) => t.stop());
         return;
@@ -72,6 +74,7 @@ export function useGestureTracking() {
             window.innerHeight,
           );
         }
+        publishGestureInput(gestureStateRef.current);
         animationFrameId = requestAnimationFrame(detectFrame);
       }
       detectFrame();
