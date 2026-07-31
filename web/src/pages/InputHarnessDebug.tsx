@@ -3,11 +3,14 @@ import { useGestureTracking } from "../gesture-engine/vision/useGestureTracking"
 import { attachMouseInput } from "../input/mouseInputAdapter";
 import { inputBus } from "../input/inputBus";
 import { DirectionButton } from "../ui/DirectionButton";
+import { type Finger } from "../input/types";
 
 export function InputHarnessDebug() {
   const { videoRef, status, errorMessage } = useGestureTracking();
   const dotRef = useRef<HTMLDivElement>(null);
   const [lastEvent, setLastEvent] = useState("none yet");
+  const [leftFingers, setLeftFingers] = useState<Finger[]>([]);
+  const [rightFingers, setRightFingers] = useState<Finger[]>([]);
 
   useEffect(() => {
     const detachMouse = attachMouseInput();
@@ -20,6 +23,13 @@ export function InputHarnessDebug() {
       if (event.type === "deselect") setLastEvent(`deselect (${event.source})`);
       if (event.type === "directionChange") {
         setLastEvent(`directionChange: ${event.direction} (${event.source})`);
+      }
+      if (event.type === "fingersChanged") {
+        if (event.source === "hand-left") {
+          setLeftFingers(event.fingers);
+        } else if (event.source === "hand-right") {
+          setRightFingers(event.fingers);
+        }
       }
     });
 
@@ -39,16 +49,28 @@ export function InputHarnessDebug() {
         playsInline
       />
 
-      <div ref={dotRef} className="pointer-events-none absolute left-0 top-0 h-5 w-5 rounded-full bg-white/80 shadow-lg" />
+      <div
+        ref={dotRef}
+        className="pointer-events-none absolute left-0 top-0 h-5 w-5 rounded-full bg-white/80 shadow-lg"
+      />
 
       <div className="absolute left-6 top-6 rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-sm text-white backdrop-blur-md">
         Last event: {lastEvent}
       </div>
 
+      <div >Left: {leftFingers.join(", ") || "None"}</div>
+      <div>Right: {rightFingers.join(", ") || "None"}</div>
+
       <div className="absolute bottom-16 left-1/2 grid -translate-x-1/2 grid-cols-3 gap-3">
-        <div /><DirectionButton direction="up" label="↑" /><div />
-        <DirectionButton direction="left" label="←" /><div /><DirectionButton direction="right" label="→" />
-        <div /><DirectionButton direction="down" label="↓" /><div />
+        <div />
+        <DirectionButton direction="up" label="↑" />
+        <div />
+        <DirectionButton direction="left" label="←" />
+        <div />
+        <DirectionButton direction="right" label="→" />
+        <div />
+        <DirectionButton direction="down" label="↓" />
+        <div />
       </div>
     </div>
   );

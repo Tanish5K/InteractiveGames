@@ -2,6 +2,7 @@ import type { NormalizedLandmark } from "@mediapipe/tasks-vision";
 import { Point2DFilter } from "../filters/point2DFilter";
 import { PinchDetector, type PinchEvent } from "./pinchDetector";
 import { SwipeDetector, type Direction } from "./swipeDetector";
+import { FingerCountDetector, type Finger } from "./fingerCountDetector";
 import { mapCoverPoint } from "../vision/coverMap";
 
 export interface GestureState {
@@ -9,12 +10,14 @@ export interface GestureState {
   isPinching: boolean;
   pinchEvent: PinchEvent;
   swipeDirection: Direction | null;
+  extendedFingers: Finger[];
 }
 
 export class GestureEngine {
   private cursorFilter = new Point2DFilter(1.2, 0.3);
   private pinchDetector = new PinchDetector();
   private swipeDetector = new SwipeDetector();
+  private fingerCountDetector = new FingerCountDetector();
 
   update(
     landmarks: NormalizedLandmark[] | null,
@@ -31,7 +34,8 @@ export class GestureEngine {
         return {
             cursor: null, 
             isPinching: false, 
-            pinchEvent, swipeDirection: null 
+            pinchEvent, swipeDirection: null, 
+            extendedFingers: [],
         };
     }
 
@@ -54,12 +58,14 @@ export class GestureEngine {
 
     const pinchEvent = this.pinchDetector.update(landmarks);
     const swipeDirection = this.swipeDetector.update(cursor, timestampMs);
+    const extendedFingers = this.fingerCountDetector.update(landmarks);
 
     return {
       cursor,
       isPinching: this.pinchDetector.isPinching(),
       pinchEvent,
       swipeDirection,
+      extendedFingers,
     };
   }
 }
