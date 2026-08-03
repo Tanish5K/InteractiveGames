@@ -7,7 +7,7 @@ import { GestureEngine, type GestureState } from "./gestureEngine";
 export type HandLabel = "Left" | "Right";
 export type TwoHandGestureState = Record<HandLabel, GestureState | null>;
 
-const SWAP_HANDEDNESS = false;
+const SWAP_HANDEDNESS = true;
 const MAX_MATCH_DISTANCE = 0.35;
 
 interface Slot {
@@ -88,9 +88,6 @@ export class TwoHandGestureEngine {
       }
     });
 
-    // Pass 2 — leftover detections (a hand newly entering frame, or
-    // reappearing after being lost) get assigned by MediaPipe's raw label,
-    // purely as a starting guess since there's no position history yet.
     detections.forEach((d, i) => {
       if (usedDetections.has(i) || !d.label) return;
       const label = d.label;
@@ -108,7 +105,6 @@ export class TwoHandGestureEngine {
       );
     });
 
-    // Any slot with nothing matched this frame — hand genuinely gone, reset it.
     (["Left", "Right"] as HandLabel[]).forEach((label) => {
       if (!matchedSlots.has(label)) {
         this.slots[label].lastWrist = null;

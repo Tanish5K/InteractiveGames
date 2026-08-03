@@ -15,4 +15,9 @@ export class Point2DFilter {
       y: this.yFilter.filter(y, timestampMs),
     };
   }
+
+  reset() {
+    this.xFilter.reset();
+    this.yFilter.reset();
+  }
 }

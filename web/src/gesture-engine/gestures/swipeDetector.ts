@@ -11,7 +11,7 @@ export class SwipeDetector {
   private cooldownMs: number;
 
   constructor(
-    velocityThreshold = 1.2, //Fine tune later
+    velocityThreshold = 0.3, //Fine tune later
     requiredStreak = 3,
     cooldownMs = 150,
   ) {
@@ -42,6 +42,9 @@ export class SwipeDetector {
     const horizontal = Math.abs(dx) >= Math.abs(dy);
     const magnitude = horizontal ? Math.abs(dx) : Math.abs(dy);
     const velocity = magnitude / dt;
+
+    // TEMPORARY — remove once velocityThreshold is tuned
+    console.log("swipe velocity:", velocity.toFixed(2), "threshold:", this.velocityThreshold);
 
     let direction: Direction | null = null;
     if (velocity > this.velocityThreshold) {

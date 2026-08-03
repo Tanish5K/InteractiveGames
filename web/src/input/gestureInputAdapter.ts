@@ -37,9 +37,11 @@ export function publishGestureInput(state: TwoHandGestureState) {
         x: gesture.cursor.x,
         y: gesture.cursor.y,
       });
+      console.log(`Ow dont pinch me there senpai ._. Pinch start detected for ${label} hand at (${gesture.cursor.x}, ${gesture.cursor.y})`); 
     }
     if (gesture.pinchEvent === "pinchEnd") {
       inputBus.emit({ type: "deselect", source });
+      console.log(`Pinch end detected for ${label} hand`);
     }
 
     if (gesture.swipeDirection) {

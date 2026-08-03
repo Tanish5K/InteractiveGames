@@ -14,7 +14,8 @@ export interface GestureState {
 }
 
 export class GestureEngine {
-  private cursorFilter = new Point2DFilter(1.2, 0.3);
+  private cursorFilter = new Point2DFilter(1.2, 0.05); // smooth, low-jitter — for the displayed pointer
+  private swipeFilter = new Point2DFilter(1.2, 0.4); // minimal smoothing — preserves true velocity for swipe
   private pinchDetector = new PinchDetector();
   private swipeDetector = new SwipeDetector();
   private fingerCountDetector = new FingerCountDetector();
@@ -27,30 +28,46 @@ export class GestureEngine {
     screenWidth: number,
     screenHeight: number,
   ): GestureState {
-
     if (!landmarks || videoWidth === 0 || videoHeight === 0) {
-        const pinchEvent = this.pinchDetector.reset();
-        this.swipeDetector.reset();
-        this.fingerCountDetector.reset();
-        return {
-            cursor: null, 
-            isPinching: false, 
-            pinchEvent, swipeDirection: null, 
-            extendedFingers: [],
-        };
+      const pinchEvent = this.pinchDetector.reset();
+      this.swipeDetector.reset();
+      this.fingerCountDetector.reset();
+      this.cursorFilter.reset();
+      this.swipeFilter.reset();
+      return {
+        cursor: null,
+        isPinching: false,
+        pinchEvent,
+        swipeDirection: null,
+        extendedFingers: [],
+      };
     }
 
     const indexTip = landmarks[8];
     const mirroredX = 1 - indexTip.x;
 
-    const smoothed = this.cursorFilter.filter(
+    const smoothedCursor = this.cursorFilter.filter(
       mirroredX,
       indexTip.y,
       timestampMs,
     );
+    const smoothedSwipe = this.swipeFilter.filter(
+      mirroredX,
+      indexTip.y,
+      timestampMs,
+    );
+
     const cursor = mapCoverPoint(
-      smoothed.x,
-      smoothed.y,
+      smoothedCursor.x,
+      smoothedCursor.y,
+      videoWidth,
+      videoHeight,
+      screenWidth,
+      screenHeight,
+    );
+    const swipePoint = mapCoverPoint(
+      smoothedSwipe.x,
+      smoothedSwipe.y,
       videoWidth,
       videoHeight,
       screenWidth,
@@ -58,7 +75,7 @@ export class GestureEngine {
     );
 
     const pinchEvent = this.pinchDetector.update(landmarks);
-    const swipeDirection = this.swipeDetector.update(cursor, timestampMs);
+    const swipeDirection = this.swipeDetector.update(swipePoint, timestampMs);
     const extendedFingers = this.fingerCountDetector.update(landmarks);
 
     return {

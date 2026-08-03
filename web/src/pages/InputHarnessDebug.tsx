@@ -8,9 +8,11 @@ import { type Finger } from "../input/types";
 export function InputHarnessDebug() {
   const { videoRef, status, errorMessage } = useGestureTracking();
   const dotRef = useRef<HTMLDivElement>(null);
+  const arrowRef = useRef<HTMLDivElement>(null);
   const [lastEvent, setLastEvent] = useState("none yet");
   const [leftFingers, setLeftFingers] = useState<Finger[]>([]);
   const [rightFingers, setRightFingers] = useState<Finger[]>([]);
+
 
   useEffect(() => {
     const detachMouse = attachMouseInput();
@@ -30,6 +32,15 @@ export function InputHarnessDebug() {
         } else if (event.source === "hand-right") {
           setRightFingers(event.fingers);
         }
+      }
+
+      if (event.type === "directionChange" && arrowRef.current) {
+        const glyphs = { up: "↑", down: "↓", left: "←", right: "→" };
+        arrowRef.current.textContent = glyphs[event.direction];
+        arrowRef.current.style.opacity = "1";
+        setTimeout(() => {
+          if (arrowRef.current) arrowRef.current.style.opacity = "0";
+        }, 400);
       }
     });
 
@@ -54,11 +65,17 @@ export function InputHarnessDebug() {
         className="pointer-events-none absolute left-0 top-0 h-5 w-5 rounded-full bg-white/80 shadow-lg"
       />
 
+      <div
+        ref={arrowRef}
+        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-8xl text-white transition-opacity duration-300"
+        style={{ opacity: 0 }}
+      />
+
       <div className="absolute left-6 top-6 rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-sm text-white backdrop-blur-md">
         Last event: {lastEvent}
       </div>
 
-      <div >Left: {leftFingers.join(", ") || "None"}</div>
+      <div>Left: {leftFingers.join(", ") || "None"}</div>
       <div>Right: {rightFingers.join(", ") || "None"}</div>
 
       <div className="absolute bottom-16 left-1/2 grid -translate-x-1/2 grid-cols-3 gap-3">

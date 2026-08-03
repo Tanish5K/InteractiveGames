@@ -1,7 +1,6 @@
 // A basic exponential smoother: blends a new value with the previous output. 
 class LowPassFilter {
   private lastOutput: number | null = null;
-
   filter(value: number, alpha: number): number {
     const output =
       this.lastOutput === null
@@ -10,9 +9,11 @@ class LowPassFilter {
     this.lastOutput = output;
     return output;
   }
-
   last(): number | null {
     return this.lastOutput;
+  }
+  reset() {
+    this.lastOutput = null;
   }
 }
 
@@ -27,7 +28,7 @@ export class OneEuroFilter {
   private xFilter = new LowPassFilter();
   private dxFilter = new LowPassFilter();
   private lastTimestamp: number | null = null;
-  
+
   private minCutoff: number;
   private beta: number;
   private dCutoff: number;
@@ -60,5 +61,11 @@ export class OneEuroFilter {
     const cutoff = this.minCutoff + this.beta * Math.abs(smoothedSpeed);
 
     return this.xFilter.filter(value, smoothingFactor(dt, cutoff));
+  }
+
+  reset() {
+    this.xFilter.reset();
+    this.dxFilter.reset();
+    this.lastTimestamp = null;
   }
 }

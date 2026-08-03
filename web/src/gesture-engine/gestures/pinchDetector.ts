@@ -11,7 +11,7 @@ export class PinchDetector {
   private enterThreshold: number;
   private exitThreshold: number;
 
-  constructor(enterThreshold = 0.35, exitThreshold = 0.5) {
+  constructor(enterThreshold = 0.3, exitThreshold = 0.45) {
     this.enterThreshold = enterThreshold;
     this.exitThreshold = exitThreshold;
   }
