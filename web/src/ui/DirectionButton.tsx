@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { inputBus } from "../src/input/inputBus";
-import type { Direction } from "../src/input/types";
+import { inputBus } from "../input/inputBus";
+import type { Direction } from "../input/types";
 
 interface Props {
   direction: Direction;

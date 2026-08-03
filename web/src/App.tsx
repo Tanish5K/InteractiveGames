@@ -5,6 +5,7 @@ import { HandCursors } from "./ui/HandCursors";
 import { MainMenu } from "./pages/MainMenu";
 import { GamesMenu } from "./pages/GamesMenu";
 import { Sandbox } from "./pages/Sandbox";
+import { SnakeGame } from "./pages/SnakeGame";
 import { PlaceholderScreen } from "./pages/PlaceholderScreen";
 import type { Screen } from "./pages/screen";
 
@@ -37,18 +38,12 @@ function App() {
       <div className="relative z-10 flex h-full w-full items-center justify-center p-8">
         {screen === "menu" && <MainMenu onNavigate={setScreen} />}
         {screen === "games" && <GamesMenu onNavigate={setScreen} />}
-        {screen === "sandbox" && (
-          <Sandbox onBack={() => setScreen("menu")} />
-        )}
+        {screen === "sandbox" && <Sandbox onBack={() => setScreen("menu")} />}
         {screen === "login" && (
           <PlaceholderScreen title="Login" onBack={() => setScreen("menu")} />
         )}
         {screen === "snake" && (
-          <PlaceholderScreen
-            title="Snake"
-            subtitle="Coming in Phase 5"
-            onBack={() => setScreen("games")}
-          />
+          <SnakeGame onBack={() => setScreen("games")} />
         )}
         {screen === "wordle" && (
           <PlaceholderScreen
