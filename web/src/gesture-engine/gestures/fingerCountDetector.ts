@@ -17,10 +17,16 @@ function dist(a: NormalizedLandmark, b: NormalizedLandmark): number {
 }
 
 export class FingerCountDetector {
-  private thumbThreshold: number;
-  //Test by tuning later (idk what value works) - log thumbSpread
-  constructor(thumbThreshold = 0.5) {
-    this.thumbThreshold = thumbThreshold;
+  private thumbExtended = false;
+  private thumbEnterThreshold: number;
+  private thumbExitThreshold: number;
+
+  constructor(
+    thumbEnterThreshold = 0.55,
+    thumbExitThreshold = 0.4,
+  ) {
+    this.thumbEnterThreshold = thumbEnterThreshold;
+    this.thumbExitThreshold = thumbExitThreshold;
   }
 
   update(landmarks: NormalizedLandmark[]): Finger[] {
@@ -41,10 +47,17 @@ export class FingerCountDetector {
     );
 
     const thumbSpread = dist(landmarks[4], indexMcp) / handScale;
-    if (thumbSpread > this.thumbThreshold) {
-      extended.push("thumb");
+    if (!this.thumbExtended && thumbSpread > this.thumbEnterThreshold) {
+      this.thumbExtended = true;
+    } else if (this.thumbExtended && thumbSpread < this.thumbExitThreshold) {
+      this.thumbExtended = false;
     }
+    if (this.thumbExtended) extended.push("thumb");
 
     return extended;
+  }
+
+  reset() {
+    this.thumbExtended = false;
   }
 }

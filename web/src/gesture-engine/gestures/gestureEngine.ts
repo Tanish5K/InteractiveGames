@@ -31,6 +31,7 @@ export class GestureEngine {
     if (!landmarks || videoWidth === 0 || videoHeight === 0) {
         const pinchEvent = this.pinchDetector.reset();
         this.swipeDetector.reset();
+        this.fingerCountDetector.reset();
         return {
             cursor: null, 
             isPinching: false, 
