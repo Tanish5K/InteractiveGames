@@ -32,6 +32,10 @@
   }
 }
 
+@theme {
+  --color-glass-accent: oklch(75% 0.15 220); /* cyan-ish, used for "selected/active" states */
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --text: #9ca3af;
