@@ -108,81 +108,101 @@ export function WordleGame({ onBack }: Props) {
     return { letters: [], statuses: null };
   });
 
-  return (
-    <div className="relative flex h-full w-full items-center justify-center gap-10 px-8">
-      <div className="absolute left-8 top-1/2 z-20 flex -translate-y-1/2 flex-col items-start gap-4">
-        <h1 className="text-3xl font-semibold text-white">Wordle</h1>
-        <GlassButton onSelect={onBack} className="h-11 w-24 text-sm">
-          ← Back
-        </GlassButton>
-      </div>
-
-      <div className="flex flex-col items-center gap-4">
-        <GlassPanel className="flex flex-col gap-2 p-4">
-          {rows.map((row, ri) => (
-            <div key={ri} className="flex gap-2">
-              {Array.from({ length: WORD_LENGTH }, (_, ci) => (
-                <div
-                  key={ci}
-                  className={`flex h-14 w-14 items-center justify-center rounded-xl border text-2xl font-bold uppercase text-white ${
-                    STATUS_COLOR[row.statuses ? row.statuses[ci] : "empty"]
-                  }`}
-                >
-                  {row.letters[ci] ?? ""}
+    return (
+    <div className="relative flex h-full w-full items-center justify-center px-6 py-6">
+        <div className="flex items-center justify-center gap-8">
+        {/* Board */}
+        <div className="flex flex-col items-center gap-4 shrink-0">
+            <GlassPanel className="flex flex-col gap-2 p-4">
+            {rows.map((row, ri) => (
+                <div key={ri} className="flex gap-2">
+                {Array.from({ length: WORD_LENGTH }, (_, ci) => (
+                    <div
+                    key={ci}
+                    className={`flex h-14 w-14 items-center justify-center rounded-xl border text-2xl font-bold uppercase text-white ${
+                        STATUS_COLOR[row.statuses ? row.statuses[ci] : "empty"]
+                    }`}
+                    >
+                    {row.letters[ci] ?? ""}
+                    </div>
+                ))}
                 </div>
-              ))}
-            </div>
-          ))}
-        </GlassPanel>
-        {message && <p className="text-sm text-amber-300">{message}</p>}
-      </div>
-
-      <div className="flex flex-col items-center gap-2">
-        {KEYBOARD_ROWS.map((row, ri) => (
-          <div key={ri} className="flex gap-1.5">
-            {ri === 2 && (
-              <GlassButton onSelect={handleEnter} className="h-12 w-16 text-xs">
-                Enter
-              </GlassButton>
-            )}
-            {row.split("").map((letter) => (
-              <GlassButton
-                key={letter}
-                onSelect={() => handleLetter(letter)}
-                className={`h-12 w-9 text-sm font-semibold ${keyStatus[letter] ? STATUS_COLOR[keyStatus[letter]] : ""}`}
-              >
-                {letter}
-              </GlassButton>
             ))}
-            {ri === 2 && (
-              <GlassButton
-                onSelect={handleBackspace}
-                className="h-12 w-16 text-xs"
-              >
-                ⌫
-              </GlassButton>
-            )}
-          </div>
-        ))}
-      </div>
+            </GlassPanel>
 
-      {status !== "playing" && (
-        <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-          <GlassPanel className="flex flex-col items-center gap-4 px-10 py-8">
-            <h2 className="text-2xl font-semibold text-white">
-              {status === "won" ? "You got it! 🎉" : "Out of guesses"}
-            </h2>
-            {status === "lost" && (
-              <p className="text-white/70">
-                The word was: <span className="font-semibold">{answer}</span>
-              </p>
-            )}
-            <GlassButton onSelect={restart} className="h-12 w-36 text-sm">
-              Play again
-            </GlassButton>
-          </GlassPanel>
+            {message && <p className="text-sm text-amber-300">{message}</p>}
         </div>
-      )}
+
+        {/* Right Side */}
+        <div className="flex flex-col items-center gap-4 shrink-0">
+            {/* Header */}
+            <div className="flex flex-col items-center gap-3">
+            <h1 className="text-4xl font-bold text-white">Wordle</h1>
+
+            <GlassButton onSelect={onBack} className="h-11 w-28 text-sm">
+                ← Back
+            </GlassButton>
+            </div>
+
+            {/* Keyboard */}
+            <div className="flex flex-col items-center gap-2">
+            {KEYBOARD_ROWS.map((row, ri) => (
+                <div key={ri} className="flex gap-1.5">
+                {ri === 2 && (
+                    <GlassButton
+                    onSelect={handleEnter}
+                    className="h-12 w-16 text-xs"
+                    >
+                    Enter
+                    </GlassButton>
+                )}
+
+                {row.split("").map((letter) => (
+                    <GlassButton
+                    key={letter}
+                    onSelect={() => handleLetter(letter)}
+                    className={`h-12 w-9 text-sm font-semibold ${
+                        keyStatus[letter] ? STATUS_COLOR[keyStatus[letter]] : ""
+                    }`}
+                    >
+                    {letter}
+                    </GlassButton>
+                ))}
+
+                {ri === 2 && (
+                    <GlassButton
+                    onSelect={handleBackspace}
+                    className="h-12 w-16 text-xs"
+                    >
+                    ⌫
+                    </GlassButton>
+                )}
+                </div>
+            ))}
+            </div>
+        </div>
+        </div>
+
+        {/* End Screen */}
+        {status !== "playing" && (
+        <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+            <GlassPanel className="flex flex-col items-center gap-4 px-10 py-8">
+            <h2 className="text-2xl font-semibold text-white">
+                {status === "won" ? "You got it! 🎉" : "Out of guesses"}
+            </h2>
+
+            {status === "lost" && (
+                <p className="text-white/70">
+                The word was: <span className="font-semibold">{answer}</span>
+                </p>
+            )}
+
+            <GlassButton onSelect={restart} className="h-12 w-36 text-sm">
+                Play again
+            </GlassButton>
+            </GlassPanel>
+        </div>
+        )}
     </div>
-  );
+    );
 }
