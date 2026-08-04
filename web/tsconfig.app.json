@@ -22,5 +22,5 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "archive/InputHarnessDebug.tsx", "archive/GestureDebug.tsx", "archive/LoadingOverlay.tsx", "src/ui/DirectionButton.tsx"]
+  "include": ["src", "archive/InputHarnessDebug.tsx", "archive/GestureDebug.tsx", "archive/LoadingOverlay.tsx", "archive/DirectionButton.tsx"]
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useGestureTracking } from "./gesture-engine/vision/useGestureTracking";
 import { attachMouseInput } from "./input/mouseInputAdapter";
+import { attachKeyboardInput } from "./input/keyboardInputAdapter";
 import { HandCursors } from "./ui/HandCursors";
 import { MainMenu } from "./pages/MainMenu";
 import { GamesMenu } from "./pages/GamesMenu";
@@ -13,7 +14,14 @@ function App() {
   const { videoRef, status, errorMessage } = useGestureTracking();
   const [screen, setScreen] = useState<Screen>("menu");
 
-  useEffect(() => attachMouseInput(), []);
+  useEffect(() => {
+    const detachMouse = attachMouseInput();
+    const detachKeyboard = attachKeyboardInput();
+    return () => {
+      detachMouse();
+      detachKeyboard();
+    };
+  }, []);
 
   return (
     <div className="fixed inset-0 overflow-hidden bg-neutral-950">

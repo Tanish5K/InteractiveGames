@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useGestureTracking } from "../src/gesture-engine/vision/useGestureTracking";
 import { attachMouseInput } from "../src/input/mouseInputAdapter";
 import { inputBus } from "../src/input/inputBus";
-import { DirectionButton } from "../src/ui/DirectionButton";
+import { DirectionButton } from "./DirectionButton";
 import { type Finger } from "../src/input/types";
 
 export function InputHarnessDebug() {

@@ -3,6 +3,9 @@ import type { Direction } from "../../input/types";
 export type Cell = { x: number; y: number };
 export type GameStatus = "playing" | "gameover";
 
+export const GRID_WIDTH = 40;
+export const GRID_HEIGHT = 40;
+
 const OPPOSITE: Record<Direction, Direction> = {
   up: "down",
   down: "up",
@@ -13,7 +16,8 @@ const DX: Record<Direction, number> = { up: 0, down: 0, left: -1, right: 1 };
 const DY: Record<Direction, number> = { up: -1, down: 1, left: 0, right: 0 };
 
 export class SnakeGame {
-  readonly gridSize: number;
+  readonly gridWidth: number;
+  readonly gridHeight: number;
   snake: Cell[] = [];
   direction: Direction = "right";
   private pendingDirection: Direction = "right";
@@ -21,17 +25,19 @@ export class SnakeGame {
   status: GameStatus = "playing";
   score = 0;
 
-  constructor(gridSize = 20) {
-    this.gridSize = gridSize;
+  constructor(gridWidth = GRID_WIDTH, gridHeight = GRID_HEIGHT) {
+    this.gridWidth = gridWidth;
+    this.gridHeight = gridHeight;
     this.reset();
   }
 
   reset() {
-    const mid = Math.floor(this.gridSize / 2);
+    const midX = Math.floor(this.gridWidth / 2);
+    const midY = Math.floor(this.gridHeight / 2);
     this.snake = [
-      { x: mid - 1, y: mid },
-      { x: mid - 2, y: mid },
-      { x: mid - 3, y: mid },
+      { x: midX - 1, y: midY },
+      { x: midX - 2, y: midY },
+      { x: midX - 3, y: midY },
     ];
     this.direction = "right";
     this.pendingDirection = "right";
@@ -49,8 +55,8 @@ export class SnakeGame {
     let cell: Cell;
     do {
       cell = {
-        x: Math.floor(Math.random() * this.gridSize),
-        y: Math.floor(Math.random() * this.gridSize),
+        x: Math.floor(Math.random() * this.gridWidth),
+        y: Math.floor(Math.random() * this.gridHeight),
       };
     } while (this.snake.some((s) => s.x === cell.x && s.y === cell.y));
     this.food = cell;
@@ -68,9 +74,9 @@ export class SnakeGame {
 
     const hitWall =
       next.x < 0 ||
-      next.x >= this.gridSize ||
+      next.x >= this.gridWidth ||
       next.y < 0 ||
-      next.y >= this.gridSize;
+      next.y >= this.gridHeight;
     const hitSelf = this.snake.some((s) => s.x === next.x && s.y === next.y);
     if (hitWall || hitSelf) {
       this.status = "gameover";

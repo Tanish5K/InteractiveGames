@@ -1,4 +1,4 @@
-export type InputSource = "mouse" | "hand-left" | "hand-right";
+export type InputSource = "mouse" | "hand-left" | "hand-right" | "keyboard";
 export type Direction = "up" | "down" | "left" | "right";
 export type Finger = "thumb" | "index" | "middle" | "ring" | "pinky";
 

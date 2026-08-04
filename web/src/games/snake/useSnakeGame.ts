@@ -2,19 +2,21 @@ import { useEffect, useRef, useState, type RefObject } from "react";
 import { inputBus } from "../../input/inputBus";
 import { SnakeGame } from "./snakeGame";
 
-const TICK_MS = 150; //tick speed - like in minecraft :D
-const GRID_SIZE = 20;
+const TICK_MS = 150; //tick speed - like in minecraft :p
 
-export function useSnakeGame(canvasRef: RefObject<HTMLCanvasElement | null>) {
-  const gameRef = useRef(new SnakeGame(GRID_SIZE));
+export function useSnakeGame(
+  canvasRef: RefObject<HTMLCanvasElement | null>,
+  gridWidth: number,
+  gridHeight: number,
+) {
+  const gameRef = useRef(new SnakeGame(gridWidth, gridHeight));
   const [score, setScore] = useState(0);
   const [status, setStatus] = useState<"playing" | "gameover">("playing");
 
   useEffect(() => {
     const unsubscribe = inputBus.subscribe((event) => {
-      if (event.type === "directionChange") {
+      if (event.type === "directionChange")
         gameRef.current.setDirection(event.direction);
-      }
     });
 
     let accumulator = 0;
@@ -26,16 +28,19 @@ export function useSnakeGame(canvasRef: RefObject<HTMLCanvasElement | null>) {
       const ctx = canvas?.getContext("2d");
       if (!canvas || !ctx) return;
       const game = gameRef.current;
-      const cellSize = canvas.width / game.gridSize;
+      const cellW = canvas.width / game.gridWidth;
+      const cellH = canvas.height / game.gridHeight;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       ctx.fillStyle = "rgba(244,114,182,0.85)";
       ctx.beginPath();
-      ctx.arc(
-        game.food.x * cellSize + cellSize / 2,
-        game.food.y * cellSize + cellSize / 2,
-        cellSize / 2.5,
+      ctx.ellipse(
+        game.food.x * cellW + cellW / 2,
+        game.food.y * cellH + cellH / 2,
+        cellW / 2.5,
+        cellH / 2.5,
+        0,
         0,
         Math.PI * 2,
       );
@@ -46,10 +51,10 @@ export function useSnakeGame(canvasRef: RefObject<HTMLCanvasElement | null>) {
           i === 0 ? "rgba(56,189,248,0.95)" : "rgba(56,189,248,0.6)";
         ctx.beginPath();
         ctx.roundRect(
-          segment.x * cellSize + 2,
-          segment.y * cellSize + 2,
-          cellSize - 4,
-          cellSize - 4,
+          segment.x * cellW + 2,
+          segment.y * cellH + 2,
+          cellW - 4,
+          cellH - 4,
           6,
         );
         ctx.fill();
@@ -60,17 +65,13 @@ export function useSnakeGame(canvasRef: RefObject<HTMLCanvasElement | null>) {
       const dt = time - lastTime;
       lastTime = time;
       accumulator += dt;
-
-      // run exactly as many logic steps as real elapsed time allows (otherwise slow pc = bad player experience)
       while (accumulator >= TICK_MS) {
         gameRef.current.tick();
         accumulator -= TICK_MS;
       }
-
       render();
       setScore(gameRef.current.score);
       setStatus(gameRef.current.status);
-
       animationFrameId = requestAnimationFrame(loop);
     }
 

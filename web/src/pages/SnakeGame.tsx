@@ -1,91 +1,71 @@
-import { useRef, useState } from "react";
-import { useSnakeGame } from "../games/snake/useSnakeGame";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { SnakeBoard } from "../games/snake/SnakeBoard";
 import { GlassPanel } from "../ui/GlassPanel";
 import { GlassButton } from "../ui/GlassButton";
-import { DirectionButton } from "../ui/DirectionButton";
-
-const CANVAS_SIZE = 500;
 
 interface Props {
   onBack: () => void;
 }
 
+const CELL_SIZE = 22;
+const MIN_COLS = 16;
+const MIN_ROWS = 10;
+
 export function SnakeGame({ onBack }: Props) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { score, status, restart } = useSnakeGame(canvasRef);
-  const [showArrows, setShowArrows] = useState(true);
-  const [showSettings, setShowSettings] = useState(false);
+  const measureRef = useRef<HTMLDivElement>(null);
+  const [gridDims, setGridDims] = useState<{
+    cols: number;
+    rows: number;
+  } | null>(null);
+  const [score, setScore] = useState(0);
+
+  useEffect(() => {
+    const el = measureRef.current;
+    if (!el) return;
+
+    const observer = new ResizeObserver((entries) => {
+      setGridDims((prev) => {
+        if (prev) return prev;
+        const { width, height } = entries[0].contentRect;
+        const cols = Math.max(Math.floor(width / CELL_SIZE), MIN_COLS);
+        const rows = Math.max(Math.floor(height / CELL_SIZE), MIN_ROWS);
+        return { cols, rows };
+      });
+    });
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const handleScoreChange = useCallback((s: number) => setScore(s), []);
 
   return (
-    <div className="flex flex-col items-center gap-6">
-      <div className="flex w-full max-w-[500px] items-center justify-between">
+    <div className="flex h-full w-full flex-col">
+      <div className="relative z-20 flex w-full shrink-0 items-center justify-between px-3 pt-2">
         <GlassPanel className="px-5 py-2 text-white">
           Score: <span className="font-semibold">{score}</span>
         </GlassPanel>
-        <div className="flex gap-3">
-          <GlassButton
-            onSelect={() => setShowSettings((s) => !s)}
-            className="h-11 w-11 text-lg"
-          >
-            ⚙
-          </GlassButton>
-          <GlassButton onSelect={onBack} className="h-11 w-24 text-sm">
-            ← Back
-          </GlassButton>
-        </div>
+        <GlassButton onSelect={onBack} className="h-11 w-24 text-sm">
+          ← Back
+        </GlassButton>
       </div>
 
-      {showSettings && (
-        <GlassPanel className="flex items-center gap-4 px-5 py-3 text-sm text-white">
-          <span>Show direction buttons</span>
-          <GlassButton
-            onSelect={() => setShowArrows((s) => !s)}
-            className={`h-8 w-14 ${showArrows ? "bg-glass-accent/40" : ""}`}
-          >
-            {showArrows ? "On" : "Off"}
-          </GlassButton>
-        </GlassPanel>
-      )}
-
-      <div className="relative">
-        <GlassPanel className="p-3">
-          <canvas
-            ref={canvasRef}
-            width={CANVAS_SIZE}
-            height={CANVAS_SIZE}
-            className="rounded-2xl"
+      <div
+        ref={measureRef}
+        className="relative z-10 flex min-h-0 w-full flex-1 items-center justify-center pt-3"
+      >
+        {gridDims && (
+          <SnakeBoard
+            cols={gridDims.cols}
+            rows={gridDims.rows}
+            cellSize={CELL_SIZE}
+            onScoreChange={handleScoreChange}
           />
-        </GlassPanel>
-
-        {status === "gameover" && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <GlassPanel className="flex flex-col items-center gap-4 px-10 py-8">
-              <h2 className="text-2xl font-semibold text-white">Game Over</h2>
-              <p className="text-white/70">Score: {score}</p>
-              <GlassButton onSelect={restart} className="h-12 w-32 text-sm">
-                Restart
-              </GlassButton>
-            </GlassPanel>
-          </div>
         )}
       </div>
 
-      {showArrows && (
-        <div className="grid grid-cols-3 gap-3">
-          <div />
-          <DirectionButton direction="up" label="↑" />
-          <div />
-          <DirectionButton direction="left" label="←" />
-          <div />
-          <DirectionButton direction="right" label="→" />
-          <div />
-          <DirectionButton direction="down" label="↓" />
-          <div />
-        </div>
-      )}
-
-      <p className="text-sm text-white/50">
-        Swipe to steer — arrow buttons are a pinch-friendly fallback.
+      <p className="shrink-0 pt-2 text-center text-sm text-white/70">
+        Swipe to steer, or use arrow keys.
       </p>
     </div>
   );
