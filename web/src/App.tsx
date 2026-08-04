@@ -7,6 +7,7 @@ import { MainMenu } from "./pages/MainMenu";
 import { GamesMenu } from "./pages/GamesMenu";
 import { Sandbox } from "./pages/Sandbox";
 import { SnakeGame } from "./pages/SnakeGame";
+import { WordleGame } from "./pages/WordleGame";
 import { PlaceholderScreen } from "./pages/PlaceholderScreen";
 import type { Screen } from "./pages/screen";
 
@@ -50,15 +51,9 @@ function App() {
         {screen === "login" && (
           <PlaceholderScreen title="Login" onBack={() => setScreen("menu")} />
         )}
-        {screen === "snake" && (
-          <SnakeGame onBack={() => setScreen("games")} />
-        )}
+        {screen === "snake" && <SnakeGame onBack={() => setScreen("games")} />}
         {screen === "wordle" && (
-          <PlaceholderScreen
-            title="Wordle"
-            subtitle="Coming in Phase 7"
-            onBack={() => setScreen("games")}
-          />
+          <WordleGame onBack={() => setScreen("games")} />
         )}
       </div>
     </div>
